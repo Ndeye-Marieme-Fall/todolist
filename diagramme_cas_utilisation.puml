@@ -1,6 +1,6 @@
 @startuml Diagramme_Cas_Utilisation_Presences
 
-title Système de Gestion des Présences\nDiagramme de Cas d'Utilisation
+title Systeme de Gestion des Presences\nDiagramme de Cas d'Utilisation
 
 top to bottom direction
 skinparam packageStyle rectangle
@@ -15,66 +15,60 @@ skinparam actor {
     BorderColor #A80036
 }
 
-' ===========================================
-' ACTEURS (hors système)
-' ===========================================
+' -------------------------------------------
+' ACTEURS (hors systeme)
+' -------------------------------------------
 
 ' Acteur parent abstrait
 actor "Utilisateur" as Utilisateur
 
-' Acteurs concrets — héritent de Utilisateur
-actor "Étudiant"       as Etudiant
-actor "Enseignant"     as Enseignant
+' Acteurs concrets - heritent de Utilisateur
+actor "Etudiant" as Etudiant
+actor "Enseignant" as Enseignant
 actor "Administrateur" as Admin
 
 Etudiant   --|> Utilisateur
 Enseignant --|> Utilisateur
 Admin      --|> Utilisateur
 
-' ===========================================
-' SYSTÈME
-' ===========================================
-rectangle "Système de Gestion des Présences" {
+' -------------------------------------------
+' SYSTEME
+' -------------------------------------------
+rectangle "Systeme de Gestion des Presences" {
 
-    ' --- Cas commun à tous les utilisateurs ---
+    ' Cas commun a tous les utilisateurs
     usecase "S'authentifier" as UC_Auth
 
-    ' --- Cas de l'Étudiant ---
-    usecase "Scanner le code QR"        as UC_Scan
-    usecase "Enregistrer la présence"   as UC_Enreg
-    usecase "Consulter les présences"   as UC_Consult
-    usecase "Justifier une absence"     as UC_Justif
+    ' Cas de l'Etudiant
+    usecase "Scanner le code QR" as UC_Scan
+    usecase "Enregistrer la presence" as UC_Enreg
+    usecase "Consulter les presences" as UC_Consult
+    usecase "Justifier une absence" as UC_Justif
     usecase "Recevoir des notifications" as UC_Notif
 
-    ' --- Cas de l'Enseignant ---
-    usecase "Générer le code QR"         as UC_GenQR
-    usecase "Prendre les présences"      as UC_Prise
+    ' Cas de l'Enseignant
+    usecase "Generer le code QR" as UC_GenQR
+    usecase "Prendre les presences" as UC_Prise
     usecase "Consulter les statistiques" as UC_Stats
 
-    ' --- Cas de l'Administrateur ---
-    usecase "Gérer les utilisateurs" as UC_Users
-    usecase "Gérer les cours"        as UC_Cours
-    usecase "Générer des rapports"   as UC_Rapports
+    ' Cas de l'Administrateur
+    usecase "Gerer les utilisateurs" as UC_Users
+    usecase "Gerer les cours" as UC_Cours
+    usecase "Generer des rapports" as UC_Rapports
 
-    ' --- Relations entre cas d'utilisation ---
-
-    ' <<include>> : Scanner le code QR inclut toujours Enregistrer la présence
-    ' (la flèche part du cas de base vers le cas inclus)
+    ' Relations entre cas d'utilisation
     UC_Scan ..> UC_Enreg : <<include>>
-
-    ' <<extend>> : Recevoir des notifications est optionnel,
-    ' déclenché lors d'une justification d'absence
     UC_Notif ..> UC_Justif : <<extend>>
 }
 
-' ===========================================
-' ASSOCIATIONS acteurs <-> cas d'utilisation
-' ===========================================
+' -------------------------------------------
+' ASSOCIATIONS acteurs - cas d'utilisation
+' -------------------------------------------
 
 ' Tous les utilisateurs s'authentifient (via l'acteur parent)
 Utilisateur --> UC_Auth
 
-' Étudiant
+' Etudiant
 Etudiant --> UC_Scan
 Etudiant --> UC_Consult
 Etudiant --> UC_Justif
