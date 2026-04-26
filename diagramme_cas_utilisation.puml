@@ -1,74 +1,96 @@
 @startuml Diagramme_Cas_Utilisation_Presences
 
-title Système de Gestion des Présences — Diagramme de Cas d'Utilisation
+title Système de Gestion des Présences\nDiagramme de Cas d'Utilisation
 
-left to right direction
+top to bottom direction
 skinparam packageStyle rectangle
 skinparam actorStyle awesome
-
-' ─── Acteurs ───────────────────────────────────────────────
-actor "Utilisateur" as Utilisateur
-
-actor "Étudiant"      as Etudiant
-actor "Enseignant"    as Enseignant
-actor "Administrateur" as Admin
-
-' Généralisation : les trois acteurs héritent de Utilisateur
-Etudiant    -up-|> Utilisateur
-Enseignant  -up-|> Utilisateur
-Admin       -up-|> Utilisateur
-
-' ─── Système ────────────────────────────────────────────────
-rectangle "Système de Gestion des Présences" {
-
-    ' Cas partagé par tous
-    usecase "S'authentifier" as UC_Auth
-
-    ' Cas de l'Étudiant
-    usecase "Scanner le code QR"       as UC_Scan
-    usecase "Enregistrer la présence"  as UC_Enreg
-    usecase "Consulter les présences"  as UC_Consult
-    usecase "Justifier une absence"    as UC_Justif
-    usecase "Recevoir des notifications" as UC_Notif
-
-    ' Cas de l'Enseignant
-    usecase "Générer le code QR"       as UC_GenQR
-    usecase "Prendre les présences"    as UC_Prise
-    usecase "Consulter les statistiques" as UC_Stats
-
-    ' Cas de l'Administrateur
-    usecase "Gérer les utilisateurs"   as UC_Users
-    usecase "Gérer les cours"          as UC_Cours
-    usecase "Générer des rapports"     as UC_Rapports
-
-    ' ── Relations internes ────────────────────────────────
-    ' include : Scanner le QR déclenche obligatoirement l'enregistrement
-    UC_Scan    ..> UC_Enreg   : <<include>>
-
-    ' extend : la notification est optionnelle, déclenchée en cas d'absence justifiée
-    UC_Notif   ..> UC_Justif  : <<extend>>
+skinparam usecase {
+    BackgroundColor #FEFECE
+    BorderColor #A80036
+    ArrowColor #A80036
+}
+skinparam actor {
+    BackgroundColor #FEFECE
+    BorderColor #A80036
 }
 
-' ─── Associations acteurs ↔ cas d'utilisation ───────────────
+' ===========================================
+' ACTEURS (hors système)
+' ===========================================
 
-' Tous les acteurs s'authentifient
-Utilisateur  --> UC_Auth
+' Acteur parent abstrait
+actor "Utilisateur" as Utilisateur
+
+' Acteurs concrets — héritent de Utilisateur
+actor "Étudiant"       as Etudiant
+actor "Enseignant"     as Enseignant
+actor "Administrateur" as Admin
+
+Etudiant   --|> Utilisateur
+Enseignant --|> Utilisateur
+Admin      --|> Utilisateur
+
+' ===========================================
+' SYSTÈME
+' ===========================================
+rectangle "Système de Gestion des Présences" {
+
+    ' --- Cas commun à tous les utilisateurs ---
+    usecase "S'authentifier" as UC_Auth
+
+    ' --- Cas de l'Étudiant ---
+    usecase "Scanner le code QR"        as UC_Scan
+    usecase "Enregistrer la présence"   as UC_Enreg
+    usecase "Consulter les présences"   as UC_Consult
+    usecase "Justifier une absence"     as UC_Justif
+    usecase "Recevoir des notifications" as UC_Notif
+
+    ' --- Cas de l'Enseignant ---
+    usecase "Générer le code QR"         as UC_GenQR
+    usecase "Prendre les présences"      as UC_Prise
+    usecase "Consulter les statistiques" as UC_Stats
+
+    ' --- Cas de l'Administrateur ---
+    usecase "Gérer les utilisateurs" as UC_Users
+    usecase "Gérer les cours"        as UC_Cours
+    usecase "Générer des rapports"   as UC_Rapports
+
+    ' --- Relations entre cas d'utilisation ---
+
+    ' <<include>> : Scanner le code QR inclut toujours Enregistrer la présence
+    ' (la flèche part du cas de base vers le cas inclus)
+    UC_Scan ..> UC_Enreg : <<include>>
+
+    ' <<extend>> : Recevoir des notifications est optionnel,
+    ' déclenché lors d'une justification d'absence
+    UC_Notif ..> UC_Justif : <<extend>>
+}
+
+' ===========================================
+' ASSOCIATIONS acteurs <-> cas d'utilisation
+' ===========================================
+
+' Tous les utilisateurs s'authentifient (via l'acteur parent)
+Utilisateur --> UC_Auth
 
 ' Étudiant
-Etudiant     --> UC_Scan
-Etudiant     --> UC_Consult
-Etudiant     --> UC_Justif
+Etudiant --> UC_Scan
+Etudiant --> UC_Consult
+Etudiant --> UC_Justif
+Etudiant --> UC_Notif
 
 ' Enseignant
-Enseignant   --> UC_GenQR
-Enseignant   --> UC_Prise
-Enseignant   --> UC_Consult
-Enseignant   --> UC_Stats
+Enseignant --> UC_GenQR
+Enseignant --> UC_Prise
+Enseignant --> UC_Consult
+Enseignant --> UC_Stats
+Enseignant --> UC_Notif
 
 ' Administrateur
-Admin        --> UC_Users
-Admin        --> UC_Cours
-Admin        --> UC_Rapports
-Admin        --> UC_Stats
+Admin --> UC_Users
+Admin --> UC_Cours
+Admin --> UC_Rapports
+Admin --> UC_Stats
 
 @enduml
